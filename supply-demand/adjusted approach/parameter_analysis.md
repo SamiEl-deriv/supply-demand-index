@@ -109,67 +109,6 @@ This document identifies the most critical parameters that should be kept flexib
 
 **Legend**: ↑ = Increase, ↓ = Decrease, - = No change needed
 
-## **Monitoring and Validation**
 
-### **Key Metrics to Watch After Parameter Changes**
-1. **Validation Success Rate**: Should remain above 70%
-2. **Exposure-Direction Correlation**: Should be positive and significant
-3. **Price Path Smoothness**: Visual inspection of generated paths
-4. **Response Time**: How quickly index reacts to exposure changes
-5. **Volatility Match**: How well index volatility matches market conditions
-
-### **Warning Signs of Poor Parameter Settings**
-- **Validation success rate drops below 60%**
-- **Index shows no correlation with exposure changes**
-- **Paths become too smooth (no variation) or too erratic**
-- **Index consistently over/under-reacts to market moves**
-- **Computational performance degrades significantly**
-
-## **Implementation Recommendations**
-
-### **Phase 1: Basic Controls (Week 1-2)**
-- Implement sliders for `scale`, `k`, and `sigma`
-- Add Conservative/Balanced/Aggressive presets
-- Monitor validation metrics
-
-### **Phase 2: Advanced Controls (Week 3-4)**
-- Add `alpha` and `ma_window` controls
-- Implement emergency adjustment guidelines
-- Add real-time performance monitoring
-
-### **Phase 3: Full Implementation (Week 5-6)**
-- Add `smoothness_factor` control (for Adjusted approach)
-- Implement automated parameter suggestions based on market conditions
-- Add historical parameter performance tracking
-
-## **Risk Management**
-
-### **Parameter Bounds (Hard Limits)**
-```python
-PARAMETER_BOUNDS = {
-    'scale': (25_000, 500_000),      # Prevent extreme sensitivity
-    'k': (0.1, 0.6),                # Maintain reasonable probability range
-    'sigma': (0.05, 1.5),           # Prevent extreme volatility
-    'alpha': (0.01, 0.5),           # Maintain smoothing effectiveness
-    'ma_window': (3, 50),           # Reasonable smoothing window
-    'smoothness_factor': (0.5, 5.0) # Reasonable transition control
-}
-```
-
-### **Change Limits (Per Adjustment)**
-- Maximum 20% change in any parameter per adjustment
-- Require confirmation for changes > 50% from baseline
-- Log all parameter changes with timestamps and reasons
-
-## **Conclusion**
-
-The three high-priority parameters (`scale`, `k`, `sigma`) provide the most direct control over index behavior and should be the primary focus for dealing team adjustments. The medium-priority parameters offer fine-tuning capabilities, while low-priority parameters can be adjusted occasionally for performance optimization.
-
-**Key Success Factors:**
-- Start with preset configurations before manual adjustments
-- Monitor validation metrics after each change
-- Document reasons for parameter changes
-- Implement gradual changes rather than dramatic shifts
-- Maintain parameter change logs for analysis and learning
 
 This parameter analysis provides your dealing team with the tools and guidelines needed to maintain optimal index performance across varying market conditions.
