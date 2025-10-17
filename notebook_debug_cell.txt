@@ -1,0 +1,24 @@
+# Copy and paste this into a cell in your notebook to debug:
+
+import sys
+print("Python executable:", sys.executable)
+print("Python version:", sys.version)
+
+try:
+    import pandas as pd
+    print("✅ pandas imported successfully, version:", pd.__version__)
+    print("pandas location:", pd.__file__)
+except ImportError as e:
+    print("❌ pandas import failed:", e)
+
+try:
+    import matplotlib.pyplot as plt
+    print("✅ matplotlib imported successfully")
+except ImportError as e:
+    print("❌ matplotlib import failed:", e)
+
+try:
+    import numpy as np
+    print("✅ numpy imported successfully, version:", np.__version__)
+except ImportError as e:
+    print("❌ numpy import failed:", e)

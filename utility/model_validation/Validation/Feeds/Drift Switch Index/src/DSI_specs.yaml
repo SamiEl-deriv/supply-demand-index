@@ -1,0 +1,38 @@
+# DevTest: As of 17/08/2023
+
+DSI10:
+  T: 600
+  mu: 100
+  sigma: 0.1
+  x0: 10000
+  gamma: 0.4980997907
+  ask_kappa: 0.001268393717
+  ask_epsilon: 0.000001608149
+  bid_kappa: 0.0012635732896
+  bid_epsilon: 0.0000032122775
+  pips: 0.01
+
+DSI20:
+  T: 1200
+  mu: 60
+  sigma: 0.1
+  x0: 10000
+  gamma: 0.4977183219
+  ask_kappa: 0.00152207353844
+  ask_epsilon: 0.00000231621965
+  bid_kappa: 0.00151512777478
+  bid_epsilon: 0.00000462954401
+  pips: 0.01
+
+DSI30:
+  T: 1800
+  mu: 35
+  sigma: 0.1
+  x0: 10000
+  gamma: 0.4980031156
+  ask_kappa: 0.001331813546891
+  ask_epsilon: 0.000001773476251
+  bid_kappa: 0.001326494599
+  bid_epsilon: 0.000003545474
+  pips: 0.01
+

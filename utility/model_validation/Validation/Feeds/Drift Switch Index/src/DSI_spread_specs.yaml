@@ -1,0 +1,47 @@
+DevTest: # As of 17/08/2023 - To confirm, does not 
+  DSI10:
+    perf: 1
+    com_min: 73
+    com_max: 146
+
+  DSI20:
+    perf: 1
+    com_min: 62
+    com_max: 125
+
+  DSI30:
+    perf: 1
+    com_min: 48
+    com_max: 96
+
+Demo_Phase_1: # After Demo launch 02/09/2023 until 13/09/2023
+  DSI10:
+    perf: 0.6
+    com_min: 36
+    com_max: 72
+
+  DSI20:
+    perf: 0.6
+    com_min: 31
+    com_max: 62
+
+  DSI30:
+    perf: 0.6
+    com_min: 24
+    com_max: 48
+
+Demo_Phase_2: # Demo at 14/09/2023 onwards
+  DSI10:
+    perf: 0.45
+    com_min: 36
+    com_max: 72
+
+  DSI20:
+    perf: 0.37
+    com_min: 31
+    com_max: 62
+
+  DSI30:
+    perf: 0.3
+    com_min: 24
+    com_max: 48

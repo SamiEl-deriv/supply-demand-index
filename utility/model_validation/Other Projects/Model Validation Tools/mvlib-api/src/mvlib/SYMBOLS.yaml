@@ -1,0 +1,91 @@
+1HZ100V:
+  digits: 1
+  precision: 2
+  sigma: 1
+1HZ10V:
+  digits: 1
+  precision: 2
+  sigma: 0.1
+# 1HZ150V:
+#   digits: 1
+#   precision: 2
+#   sigma: 1.5
+# 1HZ250V:
+#   digits: 1
+#   precision: 2
+#   sigma: 2.5
+1HZ25V:
+  digits: 1
+  precision: 2
+  sigma: 0.25
+1HZ50V:
+  digits: 1
+  precision: 2
+  sigma: 0.5
+1HZ75V:
+  digits: 1
+  precision: 2
+  sigma: 0.75
+R_10:
+  digits: 2
+  precision: 3
+  sigma: 0.1
+R_100:
+  digits: 1
+  precision: 2
+  sigma: 1
+R_25:
+  digits: 2
+  precision: 3
+  sigma: 0.25
+R_50:
+  digits: 3
+  precision: 4
+  sigma: 0.5
+R_75:
+  digits: 3
+  precision: 4
+  sigma: 0.75
+stpRNG:
+  step_size: 0.1
+  digits: 0
+  precision: 1
+  # sigma: 0.25
+stpRNG2:
+  step_size: 0.2
+  digits: 0
+  precision: 1
+  # sigma: 0.5
+stpRNG3:
+  step_size: 0.3
+  digits: 0
+  precision: 1
+  # sigma: 0.5
+stpRNG4:
+  step_size: 0.4
+  digits: 0
+  precision: 1
+  # sigma: 0.75
+stpRNG5:
+  step_size: 0.5
+  digits: 0
+  precision: 1
+  # sigma: 0.75
+CRASH300N:
+  digits: 2
+  precision: 3
+CRASH500:
+  digits: 2
+  precision: 3
+CRASH1000:
+  digits: 2
+  precision: 3
+BOOM300N:
+  digits: 2
+  precision: 3
+BOOM500:
+  digits: 2
+  precision: 3
+BOOM1000:
+  digits: 2
+  precision: 3

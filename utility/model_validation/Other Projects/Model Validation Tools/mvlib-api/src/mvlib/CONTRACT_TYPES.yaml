@@ -1,0 +1,15 @@
+Accumulator:
+  take_profit: 1
+  stop_loss: 0
+Vanilla:
+  take_profit: 0
+  stop_loss: 0
+Turbo:
+  take_profit: 1
+  stop_loss: 0
+Multiplier:
+  take_profit: 1
+  stop_loss: 1
+RiseFall:
+  take_profit: 0
+  stop_loss: 0  

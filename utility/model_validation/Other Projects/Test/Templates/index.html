@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- Previous head and style sections remain unchanged -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DCD Calculator</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .main-container {
+            display: flex;
+            gap: 20px;
+        }
+        .calculator-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            flex: 0 0 400px;
+        }
+        .chart-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            flex: 1;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        select, input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            display: none;
+        }
+        .current-price {
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+            color: #007bff;
+        }
+        .chart-wrapper {
+            position: relative;
+            height: 800px;
+        }
+        .loading {
+            display: none;
+            margin-top: 10px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="chart-container">
+            <div class="current-price">
+                Current Price: <span id="currentPrice">Loading...</span>
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="priceChart"></canvas>
+            </div>
+        </div>
+
+        <div class="calculator-container">
+            <h1>Dual Currency Deposit Calculator</h1>
+            <div class="form-group">
+                <label for="currencyPair">Currency Pair:</label>
+                <select id="currencyPair" onchange="updateChart()">
+                    <option value="AUDUSD">AUD/USD</option>
+                    <option value="GBPUSD">GBP/USD</option>
+                    <option value="EURUSD">EUR/USD</option>
+                    <option value="USDJPY">USD/JPY</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="duration">Duration (days):</label>
+                <select id="duration">
+                    <option value="7">7 days</option>
+                    <option value="14">14 days</option>
+                    <option value="30">30 days</option>
+                    <option value="90">90 days</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="notional">Notional Amount:</label>
+                <input type="number" id="notional" min="1000" step="1000" value="100000">
+            </div>
+            <div class="form-group">
+                <label for="strikeDirection">Strike Direction:</label>
+                <select id="strikeDirection">
+                    <option value="PUT">PUT</option>
+                    <option value="CALL">CALL</option>
+                </select>
+            </div>
+            <button onclick="calculateRate()">Calculate Rate</button>
+            <div class="loading" id="loading">Calculating...</div>
+            
+            <div id="result" class="result">
+                <h3>Calculation Result</h3>
+                <p>Currency Pair: <span id="resultCurrencyPair"></span></p>
+                <p>Spot Price: <span id="resultSpotPrice"></span></p>
+                <p>Duration: <span id="resultDuration"></span> days</p>
+                <p>Notional Amount: <span id="resultNotional"></span></p>
+                <p>Strike Direction: <span id="resultStrikeDirection"></span></p>
+                <p>Strike Price: <span id="resultStrike"></span></p>
+                <p>Enhanced Yield: <span id="resultEnhancedYield"></span>% p.a.</p>
+                <p>Base Yield: <span id="resultBaseYield"></span>% p.a.</p>
+                <p>Premium Yield: <span id="resultPremiumYield"></span>% p.a.</p>
+                <p>Option Premium: <span id="resultOptionPremium"></span></p>
+                <p>Implied Volatility: <span id="resultVolatility"></span>%</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let priceChart;
+        let priceData = {
+            labels: [],
+            prices: [],
+            rsi: [],
+            macd: [],
+            signal: [],
+            histogram: []
+        };
+
+        let currentSpotPrice = null;
+
+        // Previous technical indicator calculation functions remain unchanged
+        function calculateEMA(prices, period) {
+            const k = 2 / (period + 1);
+            let ema = prices[0];
+            const emaData = [ema];
+            
+            for (let i = 1; i < prices.length; i++) {
+                ema = prices[i] * k + ema * (1 - k);
+                emaData.push(ema);
+            }
+            
+            return emaData;
+        }
+
+        function calculateMACD(prices) {
+            if (prices.length < 26) {
+                return { macd: null, signal: null, histogram: null };
+            }
+
+            const ema12 = calculateEMA(prices, 12);
+            const ema26 = calculateEMA(prices, 26);
+            const macdLine = ema12.map((v, i) => v - ema26[i]);
+            const signalLine = calculateEMA(macdLine, 9);
+            const histogram = macdLine.map((v, i) => v - signalLine[i]);
+
+            return {
+                macd: macdLine[macdLine.length - 1],
+                signal: signalLine[signalLine.length - 1],
+                histogram: histogram[histogram.length - 1]
+            };
+        }
+
+        function calculateRSI(prices, period = 14) {
+            if (prices.length < period + 1) {
+                return null;
+            }
+
+            let gains = [];
+            let losses = [];
+
+            for (let i = 1; i < prices.length; i++) {
+                const change = prices[i] - prices[i - 1];
+                gains.push(change > 0 ? change : 0);
+                losses.push(change < 0 ? -change : 0);
+            }
+
+            let avgGain = gains.slice(0, period).reduce((a, b) => a + b) / period;
+            let avgLoss = losses.slice(0, period).reduce((a, b) => a + b) / period;
+
+            const rs = avgGain / avgLoss;
+            const rsi = 100 - (100 / (1 + rs));
+
+            return rsi;
+        }
+
+        function initChart() {
+            const ctx = document.getElementById('priceChart').getContext('2d');
+            priceChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [
+                        {
+                            label: 'Price',
+                            data: [],
+                            borderColor: '#007bff',
+                            tension: 0.1,
+                            borderWidth: 2,
+                            pointRadius: 1,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'RSI',
+                            data: [],
+                            borderColor: '#ff6b6b',
+                            tension: 0.1,
+                            borderWidth: 2,
+                            pointRadius: 1,
+                            yAxisID: 'y1'
+                        },
+                        {
+                            label: 'MACD',
+                            data: [],
+                            borderColor: '#28a745',
+                            tension: 0.1,
+                            borderWidth: 2,
+                            pointRadius: 1,
+                            yAxisID: 'y2'
+                        },
+                        {
+                            label: 'Signal',
+                            data: [],
+                            borderColor: '#ffc107',
+                            tension: 0.1,
+                            borderWidth: 2,
+                            pointRadius: 1,
+                            yAxisID: 'y2'
+                        },
+                        {
+                            label: 'Histogram',
+                            data: [],
+                            type: 'bar',
+                            backgroundColor: (context) => {
+                                const value = context.dataset.data[context.dataIndex];
+                                return value >= 0 ? '#28a745' : '#dc3545';
+                            },
+                            yAxisID: 'y2'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    plugins: {
+                        legend: {
+                            display: true
+                        }
+                    },
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: {
+                                display: true,
+                                text: 'Price'
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: 'RSI'
+                            },
+                            min: 0,
+                            max: 100,
+                            grid: {
+                                drawOnChartArea: false
+                            }
+                        },
+                        y2: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: 'MACD'
+                            },
+                            grid: {
+                                drawOnChartArea: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateChartData() {
+            const basePrices = {
+                'AUDUSD': 0.6550,
+                'GBPUSD': 1.2650,
+                'EURUSD': 1.0950,
+                'USDJPY': 148.50
+            };
+
+            const currencyPair = document.getElementById('currencyPair').value;
+            const basePrice = basePrices[currencyPair];
+
+            // Generate new price with smaller random movement
+            const newPrice = basePrice + (Math.random() - 0.5) * 0.001;
+            currentSpotPrice = newPrice;
+            
+            // Update current price display
+            document.getElementById('currentPrice').textContent = newPrice.toFixed(4);
+
+            if (priceData.prices.length > 50) {
+                priceData.prices.shift();
+                priceData.labels.shift();
+                priceData.rsi.shift();
+                priceData.macd.shift();
+                priceData.signal.shift();
+                priceData.histogram.shift();
+            }
+
+            const now = new Date();
+            priceData.labels.push(now.toLocaleTimeString());
+            priceData.prices.push(newPrice);
+
+            // Calculate RSI
+            if (priceData.prices.length >= 14) {
+                const rsi = calculateRSI(priceData.prices);
+                priceData.rsi.push(rsi);
+            } else {
+                priceData.rsi.push(null);
+            }
+
+            // Calculate MACD
+            if (priceData.prices.length >= 26) {
+                const macdData = calculateMACD(priceData.prices);
+                priceData.macd.push(macdData.macd);
+                priceData.signal.push(macdData.signal);
+                priceData.histogram.push(macdData.histogram);
+            } else {
+                priceData.macd.push(null);
+                priceData.signal.push(null);
+                priceData.histogram.push(null);
+            }
+
+            // Update chart
+            priceChart.data.labels = priceData.labels;
+            priceChart.data.datasets[0].data = priceData.prices;
+            priceChart.data.datasets[1].data = priceData.rsi;
+            priceChart.data.datasets[2].data = priceData.macd;
+            priceChart.data.datasets[3].data = priceData.signal;
+            priceChart.data.datasets[4].data = priceData.histogram;
+            priceChart.update();
+
+            // Auto-calculate DCD if result is visible
+            if (document.getElementById('result').style.display === 'block') {
+                calculateRate();
+            }
+        }
+
+        function updateChart() {
+            // Reset data when currency pair changes
+            priceData.labels = [];
+            priceData.prices = [];
+            priceData.rsi = [];
+            priceData.macd = [];
+            priceData.signal = [];
+            priceData.histogram = [];
+            currentSpotPrice = null;
+            priceChart.update();
+            document.getElementById('result').style.display = 'none';
+        }
+
+        async function calculateRate() {
+            if (!currentSpotPrice) {
+                alert("Please wait for price data to load");
+                return;
+            }
+
+            // Show loading state
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('result').style.display = 'none';
+
+            // Get input values
+            const currencyPair = document.getElementById('currencyPair').value;
+            const duration = parseInt(document.getElementById('duration').value);
+            const notional = parseFloat(document.getElementById('notional').value);
+            const strikeDirection = document.getElementById('strikeDirection').value;
+
+            try {
+                // Call DCD pricer API
+                const response = await fetch('/calculate_dcd', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        currency_pair: currencyPair,
+                        spot_price: currentSpotPrice,
+                        notional: notional,
+                        tenor_days: duration,
+                        strike_direction: strikeDirection
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!data.success) {
+                    throw new Error(data.error || 'Failed to calculate DCD');
+                }
+
+                const result = data.result;
+
+                // Display results
+                document.getElementById('resultCurrencyPair').textContent = currencyPair;
+                document.getElementById('resultSpotPrice').textContent = currentSpotPrice.toFixed(4);
+                document.getElementById('resultDuration').textContent = duration;
+                document.getElementById('resultNotional').textContent = notional.toLocaleString();
+                document.getElementById('resultStrikeDirection').textContent = strikeDirection;
+                document.getElementById('resultStrike').textContent = result.strike_price;
+                document.getElementById('resultEnhancedYield').textContent = result.enhanced_yield;
+                document.getElementById('resultBaseYield').textContent = result.base_yield;
+                document.getElementById('resultPremiumYield').textContent = result.premium_yield;
+                document.getElementById('resultOptionPremium').textContent = result.option_premium.toLocaleString();
+                document.getElementById('resultVolatility').textContent = result.volatility;
+                
+                // Show result div
+                document.getElementById('result').style.display = 'block';
+            } catch (error) {
+                alert('Error calculating DCD: ' + error.message);
+            } finally {
+                // Hide loading state
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+
+        // Initialize chart when page loads
+        initChart();
+
+        // Update chart every second
+        setInterval(updateChartData, 1000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+
+[tool.setuptools.packages.find]
+where = ["mvlib-indices/src", "mvlib-api/src"]
+include = ["mvlib.*"]
+
+[project]
+name = "mvlib"
+version = "0.1"
+authors = [
+  { name="Vishal Menon", email="vishal.menon@deriv.com" },
+  { name="Matthew Chan", email="matthew.chan@deriv.com" }
+]
+description = "Model Validation Tools Library"
+requires-python = ">=3.11"
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Operating System :: OS Independent",  
+  "Private :: Do Not Upload"
+]
+dynamic = ["dependencies"]
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+
+[project.urls]
+Homepage = "https://github.com/regentmarkets/quants-model-validation/tree/master/Other%20Projects/Model%20Validation%20Tools/"
